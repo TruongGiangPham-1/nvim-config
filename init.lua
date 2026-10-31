@@ -432,12 +432,20 @@ do
   }
 
   -- [[ Colorscheme ]]
-  -- You can easily change to a different colorscheme.
-  -- Change the name of the colorscheme plugin below, and then
-  -- change the command under that to load whatever the name of that colorscheme is.
+  -- To add a new colorscheme to the rotation:
+  --   1. `vim.pack.add { gh 'author/repo.nvim' }` below, plus any setup() it needs
+  --   2. append its `:colorscheme` name to the `colorschemes` list
+  -- Press <leader>tc to cycle to the next one; it's remembered for next launch.
   --
-  -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-  vim.pack.add { gh 'folke/tokyonight.nvim' }
+  -- If you want to browse everything installed (without adding to the list), use `:Telescope colorscheme`.
+  vim.pack.add {
+    gh 'sainnhe/gruvbox-material',
+    gh 'folke/tokyonight.nvim',
+  }
+  vim.o.background = 'dark' -- 'dark' | 'light'
+  vim.g.gruvbox_material_background = 'medium' -- 'soft' | 'medium' | 'hard'
+  vim.g.gruvbox_material_foreground = 'material' -- 'material' | 'mix' | 'original'
+  vim.g.gruvbox_material_enable_italic = 0
   ---@diagnostic disable-next-line: missing-fields
   require('tokyonight').setup {
     styles = {
@@ -445,10 +453,32 @@ do
     },
   }
 
-  -- Load the colorscheme here.
-  -- Like many other themes, this one has different styles, and you could load
-  -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  vim.cmd.colorscheme 'tokyonight-night'
+  local colorschemes = { 'gruvbox-material', 'tokyonight-night' }
+  local colorscheme_state = vim.fn.stdpath 'state' .. '/colorscheme'
+
+  local function save_colorscheme(name) vim.fn.writefile({ name }, colorscheme_state) end
+
+  local function load_colorscheme()
+    if vim.fn.filereadable(colorscheme_state) == 1 then return vim.fn.readfile(colorscheme_state)[1] end
+  end
+
+  local function set_colorscheme(name)
+    local ok = pcall(vim.cmd.colorscheme, name)
+    if not ok then return end
+    save_colorscheme(name)
+    vim.notify('colorscheme: ' .. name)
+  end
+
+  vim.keymap.set('n', '<leader>tc', function()
+    local idx = 1
+    for i, name in ipairs(colorschemes) do
+      if name == vim.g.colors_name then idx = i end
+    end
+    set_colorscheme(colorschemes[(idx % #colorschemes) + 1])
+  end, { desc = '[T]oggle [C]olorscheme' })
+
+  -- Load the colorscheme here: whatever was last saved, falling back to the first in the list.
+  vim.cmd.colorscheme(load_colorscheme() or colorschemes[1])
 
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
