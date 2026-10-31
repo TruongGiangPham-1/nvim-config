@@ -256,6 +256,15 @@ do
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
     callback = function() vim.hl.on_yank() end,
   })
+
+  -- Don't auto-insert the comment leader (e.g. `//`) when pressing <Enter>
+  -- from inside a line comment, or when opening a new line with `o`/`O`
+  vim.api.nvim_create_autocmd('FileType', {
+    desc = "Don't continue comments onto new line",
+    group = vim.api.nvim_create_augroup('no-auto-comment', { clear = true }),
+    pattern = { 'c', 'cpp' },
+    callback = function() vim.opt_local.formatoptions:remove { 'r', 'o' } end,
+  })
 end
 
 -- ============================================================
