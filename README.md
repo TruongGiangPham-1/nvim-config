@@ -4,6 +4,7 @@ My Neovim config, based on [kickstart.nvim](https://github.com/nvim-lua/kickstar
 
 - Plugins are managed by the built-in `vim.pack`; versions are pinned in `nvim-pack-lock.json`.
 - LSP: `clangd`, `pyright`, `lua_ls` (installed through Mason).
+- C/C++ debugger: nvim-dap + nvim-dap-ui with `codelldb` (installed through Mason). See [Debugging C/C++](#debugging-cc).
 - Fuzzy finding with Telescope, file tree with Neo-tree (`\`), Treesitter highlighting.
 - Leader key is `<space>`.
 
@@ -34,7 +35,7 @@ nvim
 
 Make sure `~/.local/bin` is on your `PATH` (add `export PATH="$HOME/.local/bin:$PATH"` to `~/.bashrc`).
 
-On first launch the plugins install and Mason downloads the language servers. Wait for it to finish, then restart nvim. Run `:checkhealth` if anything looks off.
+On first launch the plugins install and Mason downloads the language servers and the `codelldb` debugger. Wait for it to finish, then restart nvim. Run `:checkhealth` if anything looks off.
 
 Other distros: install the same tools with your package manager (`ripgrep`, `fd`, `git`, `make`, `gcc`, `unzip`, and `xclip` or `wl-clipboard`).
 
@@ -74,6 +75,32 @@ Verify with `:checkhealth provider`.
 | `\` | Toggle file tree |
 | `<C-h>` / `<C-l>` | Move between windows |
 | `grd` | Go to definition (with LSP attached) |
+
+## Debugging C/C++
+
+Breakpoints and stepping work like the VS Code debugger, using [nvim-dap](https://github.com/mfussenegger/nvim-dap), [nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui) and `codelldb`. The setup is in `lua/kickstart/plugins/debug.lua`.
+
+1. Compile with debug info and no optimization, otherwise you can't step through the source:
+   ```bash
+   g++ -g -O0 main.cpp -o main
+   ```
+2. In nvim, put the cursor on a line and press `<space>b` to set a breakpoint.
+3. Press `F5` and pick **LLDB: Launch** (or **LLDB: Launch (args)** to pass arguments). Enter the path to the executable, e.g. `./main`. Relative paths are resolved from the directory nvim was started in.
+4. The debug panels (variables, watches, call stack, breakpoints) open automatically and close when the program exits.
+
+| Key | Action |
+| --- | --- |
+| `F5` | Start / continue |
+| `F2` | Step over |
+| `F1` | Step into |
+| `F3` | Step out |
+| `<space>b` | Toggle breakpoint |
+| `<space>B` | Conditional breakpoint |
+| `F7` | Toggle the debug panels (see the last session's output) |
+
+If `F5` says there is no adapter, check that `codelldb` is installed with `:Mason`.
+
+The system `gdb` is not used. GDB only supports DAP from version 14, and Ubuntu 22.04 ships 12.
 
 ## Updating
 
