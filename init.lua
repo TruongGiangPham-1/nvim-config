@@ -439,13 +439,14 @@ do
   --
   -- If you want to browse everything installed (without adding to the list), use `:Telescope colorscheme`.
   vim.pack.add {
-    gh 'sainnhe/gruvbox-material',
+    gh 'ellisonleao/gruvbox.nvim',
     gh 'folke/tokyonight.nvim',
   }
   vim.o.background = 'dark' -- 'dark' | 'light'
-  vim.g.gruvbox_material_background = 'medium' -- 'soft' | 'medium' | 'hard'
-  vim.g.gruvbox_material_foreground = 'material' -- 'material' | 'mix' | 'original'
-  vim.g.gruvbox_material_enable_italic = 0
+  require('gruvbox').setup {
+    contrast = 'hard', -- '' | 'soft' | 'hard'
+    italics = false,
+  }
   ---@diagnostic disable-next-line: missing-fields
   require('tokyonight').setup {
     styles = {
@@ -453,7 +454,7 @@ do
     },
   }
 
-  local colorschemes = { 'gruvbox-material', 'tokyonight-night' }
+  local colorschemes = { 'gruvbox', 'tokyonight-night' }
   local colorscheme_state = vim.fn.stdpath 'state' .. '/colorscheme'
 
   local function save_colorscheme(name) vim.fn.writefile({ name }, colorscheme_state) end
