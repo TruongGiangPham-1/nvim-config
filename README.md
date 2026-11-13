@@ -10,6 +10,8 @@ My Neovim config, based on [kickstart.nvim](https://github.com/nvim-lua/kickstar
 
 Requires **Neovim 0.12 or newer**. Distro packages (e.g. apt) are usually too old.
 
+Install guides: [Linux](#install-on-linux-debianubuntu) · [WSL2](#install-on-wsl2) · [Windows](#install-on-windows-powershell)
+
 ## Install on Linux (Debian/Ubuntu)
 
 ```bash
@@ -64,6 +66,42 @@ If plugins were already cloned with CRLF, delete `~/.local/share/nvim` and start
 Verify with `:checkhealth provider`.
 
 **Icons.** `vim.g.have_nerd_font` is `false` in `init.lua`. If you install a Nerd Font in Windows Terminal, set it to `true`.
+
+## Install on Windows (PowerShell)
+
+Native Windows, no WSL. Windows 8 or newer is required.
+
+```powershell
+# 1. Neovim 0.12+ and search tools
+winget install Neovim.Neovim BurntSushi.ripgrep.MSVC sharkdp.fd
+
+# 2. C compiler: Treesitter compiles its parsers locally.
+#    Pick the "Desktop development with C++" workload in the installer.
+#    Skip this if Visual Studio or Build Tools with C++ is already installed.
+winget install Microsoft.VisualStudio.2022.BuildTools
+
+# 3. tree-sitter CLI (needs Node.js; `cargo install tree-sitter-cli` also works)
+npm install -g tree-sitter-cli
+
+# 4. Optional: make, for telescope-fzf-native (skipped if make is missing)
+winget install ezwinports.make
+
+# 5. Line endings: avoid `E488: Trailing characters: ^M`
+git config --global core.autocrlf input
+
+# 6. Config. On Windows it lives in %LOCALAPPDATA%\nvim
+git clone https://github.com/TruongGiangPham-1/nvim-config.git $env:LOCALAPPDATA\nvim
+```
+
+Open a new terminal so `PATH` picks up the new tools, then run `nvim`. As on Linux, wait for plugins and Mason to finish, restart, and run `:checkhealth`.
+
+Notes:
+
+- **Compiler not found.** `cl.exe` is usually not on `PATH` in a normal PowerShell window. If Treesitter parsers fail to build (check `:checkhealth nvim-treesitter`), start nvim from **Developer PowerShell for VS 2022**, which adds it to `PATH`.
+- **`VCRUNTIME140.dll` missing** when starting nvim: install the Visual C++ Redistributable (`winget install Microsoft.VCRedist.2015+.x64`).
+- **Clipboard** works without extra tools. `unnamedplus` uses the Windows clipboard directly.
+- **Plugin data** is stored in `%LOCALAPPDATA%\nvim-data` (the Windows counterpart of `~/.local/share/nvim`). Delete it to reinstall plugins from scratch.
+- **Icons:** same as WSL. Install a Nerd Font in Windows Terminal and set `vim.g.have_nerd_font = true`.
 
 ## Keys
 
