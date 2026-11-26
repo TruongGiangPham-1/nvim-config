@@ -10,7 +10,7 @@ My Neovim config, based on [kickstart.nvim](https://github.com/nvim-lua/kickstar
 
 Requires **Neovim 0.12 or newer**. Distro packages (e.g. apt) are usually too old.
 
-Install guides: [Linux](#install-on-linux-debianubuntu) · [WSL2](#install-on-wsl2) · [Windows](#install-on-windows-powershell)
+Install guides: [Linux](#install-on-linux-debianubuntu) · [Arch Linux](#install-on-arch-linux) · [WSL2](#install-on-wsl2) · [Windows](#install-on-windows-powershell)
 
 ## Install on Linux (Debian/Ubuntu)
 
@@ -40,6 +40,26 @@ Make sure `~/.local/bin` is on your `PATH` (add `export PATH="$HOME/.local/bin:$
 On first launch the plugins install and Mason downloads the language servers and the `codelldb` debugger. Wait for it to finish, then restart nvim. Run `:checkhealth` if anything looks off.
 
 Other distros: install the same tools with your package manager (`ripgrep`, `fd`, `git`, `make`, `gcc`, `unzip`, and `xclip` or `wl-clipboard`).
+
+## Install on Arch Linux
+
+The official repos already ship Neovim 0.12+ and the tree-sitter CLI, so no tarball or symlinks are needed.
+
+```bash
+# 1. Dependencies (base-devel provides gcc and make; nodejs/npm are needed for Mason to install pyright)
+sudo pacman -S --needed git neovim base-devel unzip curl ripgrep fd tree-sitter-cli nodejs npm
+
+# 2. Clipboard: wl-clipboard on Wayland, xclip on X11
+sudo pacman -S --needed wl-clipboard   # or: xclip
+
+# 3. Config
+git clone git@github.com:TruongGiangPham-1/nvim-config.git ~/.config/nvim
+nvim
+```
+
+As on Debian, wait for the plugins and Mason to finish on first launch, restart nvim, and run `:checkhealth` if anything looks off.
+
+**Icons (optional).** Install a Nerd Font (e.g. `sudo pacman -S ttf-jetbrains-mono-nerd`), select it in your terminal, and set `vim.g.have_nerd_font = true` in `init.lua`.
 
 ## Install on WSL2
 
